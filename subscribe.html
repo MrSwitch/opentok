@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<script src="http://staging.tokbox.com/v0.91/js/TB.min.js"></script>
+
+<div id="videowall"><div id="publisher"></div></div> <span id="countdown"></span>
+
+<script>
+
+// Settings
+var apiKey = '12142792',
+    token = "devtoken",
+    sessionID = "1_MX4xMjE0Mjc5Mn4xMjcuMC4wLjF-MjAxMi0wMi0yMyAyMzowNDoxOC44NTE2ODQrMDA6MDB-MC44MzE0ODQwMzIwMjV-";
+
+
+// define debug level and global exception handler
+TB.setLogLevel(TB.DEBUG);
+
+
+if(!TB.checkSystemRequirements()){
+    alert('Ironic, new things are supposed to be Flashy');
+}
+
+
+//
+// SESSION
+// Add our session ID
+//
+var session = TB.initSession(sessionID);
+
+// Add Callback Handler to the sessionConnedted Event
+session.addEventListener("sessionConnected", function (event) {
+	session.publish('publisher', {name:navigator.userAgent} );
+
+    // Subscribe to existing streams
+    subscribeStream(event.streams);
+});
+
+
+session.addEventListener("streamCreated", function(event){subscribeStream(event.streams);});
+session.connect(apiKey, token);
+
+
+
+
+function subscribeStream(streams){
+    for (i = 0; i < streams.length; i++) {
+        var stream = streams[i];
+        if (stream.connection.connectionId != session.connection.connectionId) {
+        	
+        	// add dom element
+        	document.getElementById('videowall').appendChild((function(){ 
+				var div = document.createElement('div');
+				div.setAttribute('id', stream.streamId);
+        		return div;
+        	})());
+
+        	// Add stream
+            session.subscribe(stream, stream.streamId );
+        }
+    }	
+}
+
+
+
+</script>
