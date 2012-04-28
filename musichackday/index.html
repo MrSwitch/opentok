@@ -84,6 +84,10 @@ function subscribeStream(streams){
     }	
 }
 
+$('#signal-test').click(function(){
+	session.signal()
+});
+
 </script>
 <style>
 	body{
@@ -166,12 +170,15 @@ function subscribeStream(streams){
 		height:100px;
 		width:150px;
 	}
+	ol li:first-child {
+		width:873px;
+		height:648px;
+		background:no-repeat url(img/stage-bg.png);
+	}
 	ol li:first-child div{
 		height:300px;
 		width:400px;
 	}
-
-
 
 </style>
 <nav>
@@ -229,7 +236,6 @@ function subscribeStream(streams){
 	$('button.boot').click(function(){
 
 		// boots the current artist from the top spot
-
 
 		// add to the stateManager the boot command to boot the current number one user.
 		stateManager.set('voteup', current_stream.connection.connectionId);
