@@ -58,13 +58,13 @@ function vote(event){
 		// update local state
 		state.votedown = parseInt(event.changedValues['votedown'],10);
 		// Update local UI
-		$('.votesdown').html(state.votedown);
+		$('.votesdown').html(state.votedown||'');
 	}
 	if("voteup" in event.changedValues){
 		// update local state
 		state.voteup = parseInt(event.changedValues['voteup'],10);
 		// Update local UI
-		$('.votesup').html(state.voteup);
+		$('.votesup').html(state.voteup||'');
 	}
 
 	//
@@ -177,6 +177,50 @@ $('#signal-test').click(function(){
 	}
 	button{
 		font-size:1.5em;
+	}
+
+button{
+	border:none;
+	background:#222222;
+	filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0,startColorstr='#30FFFFFF', endColorstr='#30000000');
+	background:-webkit-gradient(linear,left top, left bottom, from(rgba(255,255,255,0.2)), to(rgba(0,0,0,0.2)), 
+				color-stop(50%,rgba(255,255,255,0)), 
+				color-stop(50%,rgba(0,0,0,0)));
+	background: -moz-linear-gradient(rgba(255,255,255,0.2) 0,rgba(255,255,255,0) 49%,rgba(0,0,0,0) 51%,rgba(0,0,0,0.2) 100%);
+    -webkit-box-shadow: rgba(255, 255, 255, 0.1) 0 1px inset,
+                        rgba(0, 0, 0, 0.4) 0px 1px 1px;
+    -moz-box-shadow: rgba(255, 255, 255, 0.1) 0 1px inset,
+                        rgba(0, 0, 0, 0.4) 0px 1px 1px;
+	text-shadow:rgba(0, 0, 0, 0.4) 0px 1px;
+
+	-webkit-border-radius:3px;
+	-moz-border-radius:3px;
+	border-radius:3px;
+	padding:3px 6px;
+	color:white;/*IE*/
+	color:rgba(255,255,255,0.5);
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	font-family:"Lucida Grande", Arial, sans-serif;
+	cursor:pointer;
+	vertical-align: middle;
+}
+/*
+	button:hover{
+		color:white;
+		-moz-box-shadow: 0 1px 2px rgba(255,255,255,0.3);
+		-webkit-box-shadow: 0 1px 2px rgba(255,255,255,0.3);
+	}
+*/
+	button:active,button.active{
+	    -webkit-box-shadow: rgba(255, 255, 255, 0.2) 0 1px,
+	                        rgba(0, 0, 0, 0.7) 0px 1px 3px inset,
+	                        rgba(0, 0, 0, 0.1) 0px -5px 12px inset;
+	    -moz-box-shadow: rgba(255, 255, 255, 0.2) 0 1px,
+	                        rgba(0, 0, 0, 0.7) 0px 1px 3px inset,
+	                        rgba(0, 0, 0, 0.1) 0px -5px 12px inset;
+		text-shadow:white 0 0 5px;
+		color:white;
 	}
 
 	header h1{
