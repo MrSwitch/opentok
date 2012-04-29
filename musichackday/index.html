@@ -212,7 +212,8 @@ button{
 		-webkit-box-shadow: 0 1px 2px rgba(255,255,255,0.3);
 	}
 */
-	button:active,button.active{
+	button:active,
+	button.active{
 	    -webkit-box-shadow: rgba(255, 255, 255, 0.2) 0 1px,
 	                        rgba(0, 0, 0, 0.7) 0px 1px 3px inset,
 	                        rgba(0, 0, 0, 0.1) 0px -5px 12px inset;
@@ -319,8 +320,7 @@ section{
 		margin:0 20px;
 		margin-top:220px;
 	}
-	section .stage:empty + button,
-	section .stage:empty + button + button{
+	section .stage:empty ~ button{
 		display:none;
 	}
 		section .stage span{
@@ -451,7 +451,7 @@ footer{
 		var name = $('ul li.selected').html() + ' ('+this.name.value+')';
 
 		// Publish your own stream
-		publisher = session.publish('publisher', {name:name, nameDisplayMode:'off', width:150, height: 100} );
+		publisher = session.publish('publisher', {name:name, nameDisplayMode:'off'} );
 	});
 
 
