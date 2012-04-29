@@ -32,32 +32,46 @@ var apiKey = '12142792',
 //
 var session = TB.initSession(sessionID),
 	stateManager,
-	publisher;
+	publisher, 
+	state = {voteup:0,votedown:0};
 
+//
+// Listen out for events
 // Add Callback Handler to the sessionConnedted Event
 session.addEventListener("sessionConnected", function (event) {
 
 	// Get State
 	stateManager = session.getStateManager();
-	stateManager.addEventListener("changed:boot", boot);
-
-
-	// Publish your own stream
-	publisher = session.publish('publisher', {name:name} );
+	stateManager.addEventListener("changed", vote);
 
     // Subscribe to existing streams
     subscribeStream(event.streams);
 });
 
 
-function boot(event){
-	// Find the connectionID this is associated with. And shrink it.
 
+//
+// Votes coming in
+// Tally up the vote ups and the vote downs
+//
+function vote(event){
+	
 
-	// 
-	console.log([event.changedValues["boot"], session.connection.connectionId]);
+	if("votedown" in event.changedValues){
+		// update local state
+		state.votedown = parseInt(event.changedValues['votedown'],10);
+		// Update local UI
+		$('.votesdown').html(state.votedown);
+	}
+	if("voteup" in event.changedValues){
+		// update local state
+		state.voteup = parseInt(event.changedValues['voteup'],10);
+		// Update local UI
+		$('.votesup').html(state.voteup);
+	}
 
-	// trigger the publisher boots themselves
+	//
+	// If more than 
 	if( event.changedValues["boot"] && event.changedValues["boot"] == session.connection.connectionId ){
 		// unpublish yourself from the stream
 		session.unpublish(publisher);
@@ -65,27 +79,63 @@ function boot(event){
 }
 
 
+//
+// Add session events for listening to stream created and destroyed events.
+// These call the functions below
+//
 session.addEventListener("streamCreated", function(event){subscribeStream(event.streams);});
+session.addEventListener("streamDestroyed", function(event){	console.log(event);
+unsubscribeStream(event.streams);});
+
+// Connect to the session
 session.connect(apiKey, token);
 
+
+
+//
+// A person is added to the list and is publishing their stream.
+// We can queue them in the background.
+//
 function subscribeStream(streams){
-	current_stream = streams[0];
+
     for (i = 0; i < streams.length; i++) {
         var stream = streams[i];
 //        if (stream.connection.connectionId != session.connection.connectionId) {
         	
         	// add dom element
-        	$('<li><div><div id="'+ stream.streamId +'"></div></div> "'+ stream.name +'"</li>').appendTo('ol');
+        	$('<li id="'+ stream.streamId +'"><div><div id="_'+ stream.streamId +'"></div></div> "'+ stream.name +'"</li>').appendTo('ol');
 
         	// Add stream
-            var sub = session.subscribe(stream, stream.streamId);
-
+            var sub = session.subscribe(stream, '_'+stream.streamId);
 
 			$('#'+sub.id).width('100%').height('100%');
 
  //       }
     }	
 }
+
+//
+// A person on the list or on stage may have killed there session or booted offstage.
+// This function is listening to this trigger
+// And will remove the items from everyone elses view.
+//
+function unsubscribeStream(streams){
+
+    for (i = 0; i < streams.length; i++) {
+        var stream = streams[i];
+        $('#'+stream.streamId).remove();
+
+        // if this is the current users session
+        if (stream.connection.connectionId === session.connection.connectionId) {
+        	// Hide the users video
+        	$('#usermedia').hide();
+        }
+    }
+}
+
+
+
+
 
 $('#signal-test').click(function(){
 	session.signal()
@@ -207,9 +257,6 @@ $('#signal-test').click(function(){
 	</ul>
 	<audio controls></audio>
 
-	<h2>Verify your camera</h2>
-	<div id="videowall"><div id="publisher"></div></div>
-
 
 	<h2>Tell us your name</h2>
 	<form class='join'>
@@ -217,10 +264,17 @@ $('#signal-test').click(function(){
 		<button>Get in line</button>
 	</form>
 
+
+	<div id='usermedia' style="display:none;">
+		<h2>Verify your camera</h2>
+		<div id="videowall"></div>
+		<button class="boot">Choke</button>
+	</div>
+
 </nav>
 <section>
 
-	<button class="voteup">&#x2714; oh yeah!</button> <button class="votedown">&#x2718; boo!</button>
+	<button class="voteup">&#x2714; oh yeah! <span class="votesup"></span></button> <button class="votedown">&#x2718; boo! <span class="votesdown"></span></button>
 	<ol>
 	</ol>
 	
@@ -248,13 +302,41 @@ $('#signal-test').click(function(){
 		});
 	});
 
-	$('button.boot').click(function(){
+	$('form.join').submit(function(e){
+		e.preventDefault();
+
+		// Enable join
+		$('#usermedia').show();
+
+		$('#videowall').html('<div id="publisher"></div>');
+
+		// Publish your own stream
+		publisher = session.publish('publisher', {name:this.name.value} );
+	});
+
+
+
+	$('button.voteup').click(function(){
+
+		// boots the current artist from the top spot
+
+
+		// add to the stateManager the boot command to boot the current number one user.
+		stateManager.set('voteup', ''+ ++state.voteup);
+	});
+
+	$('button.votedown').click(function(){
 
 		// boots the current artist from the top spot
 
 		// add to the stateManager the boot command to boot the current number one user.
-		stateManager.set('voteup', current_stream.connection.connectionId);
+		stateManager.set('votedown', ''+ ++state.votedown);
+	});
 
+
+	$('button.boot').click(function(){
+		// The user choked
+		session.unpublish(publisher);
 	});
 
 
