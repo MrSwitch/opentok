@@ -69,6 +69,11 @@ function vote(event){
 
 	//
 	// If more than 
+	if( ( state.votedown - state.voteup ) > 3 
+		&& $('section .stage > div:first').data('connection').connectionId === session.connection.connectionId ){
+		stateManager.set({votedown:'0',voteup:'0'});
+		session.unpublish(publisher);
+	}
 }
 
 
@@ -99,7 +104,7 @@ function subscribeStream(streams){
         	$('<li id="__'+ stream.streamId +'">'+ stream.name +'"</li>').appendTo('ol');
 
         	// Queue the video
-        	$('<div id="'+ stream.streamId +'"><div><div id="_'+ stream.streamId +'"></div></div> <span>"'+ stream.name +'"</span></div>').appendTo('.stage');
+        	$('<div id="'+ stream.streamId +'"><div><div id="_'+ stream.streamId +'"></div></div> <span>"'+ stream.name +'"</span></div>').data(stream).appendTo('.stage');
 
         	// Add stream
             var sub = session.subscribe(stream, '_'+stream.streamId, {nameDisplayMode:'off'});
@@ -131,7 +136,7 @@ function unsubscribeStream(streams){
     	// Are you on stage and being booted?
     	if($('section .stage > div:first').attr('id') === ''+stream.streamID){
     		// Reset the state
-			stateManager.set({votedown:0,voteup:0});
+			stateManager.set({votedown:'0',voteup:'0'});
     	}
 
         // Remove
