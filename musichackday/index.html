@@ -319,6 +319,10 @@ section{
 		margin:0 20px;
 		margin-top:220px;
 	}
+	section .stage:empty + button,
+	section .stage:empty + button + button{
+		display:none;
+	}
 		section .stage span{
 			display: block;
 			border-radius:10px;
@@ -400,8 +404,7 @@ footer{
 </nav>
 <section>
 	
-	<div class="stage">
-	</div>
+	<div class="stage"></div>
 
 	<button class="voteup">&#x2714; oh yeah! <span class="votesup"></span></button> <button class="votedown">&#x2718; boo! <span class="votesdown"></span></button>
 	
