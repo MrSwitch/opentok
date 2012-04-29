@@ -69,10 +69,6 @@ function vote(event){
 
 	//
 	// If more than 
-	if( event.changedValues["boot"] && event.changedValues["boot"] == session.connection.connectionId ){
-		// unpublish yourself from the stream
-		session.unpublish(publisher);
-	}
 }
 
 
@@ -124,13 +120,25 @@ function unsubscribeStream(streams){
 
     for (i = 0; i < streams.length; i++) {
         var stream = streams[i];
-        $('#'+stream.streamId).remove();
 
         // if this is the current users session
         if (stream.connection.connectionId === session.connection.connectionId) {
+
         	// Hide the users video
         	$('#usermedia').hide();
+
+        	// Are you on stage and being booted?
+        	if($('section .stage > div:first').attr('id') === ''+stream.streamID){
+        		// Reset the state
+				stateManager.set({votedown:0,voteup:0});
+        	}
         }
+
+        // Remove
+        $('#'+stream.streamId).remove();
+    	// Remove from list
+    	$('#__'+stream.streamId).remove();
+
     }
 
     // If you are live on stage
@@ -162,21 +170,27 @@ $('#signal-test').click(function(){
 	*{
 		box-sizing:border-box;
 	}
+	button{
+		font-size:1.5em;
+	}
 
 	header h1{
 		margin-top:0;
 		font-family: 'Paytone One', Helvetica, Arial, sans-serif;
 		font-weight:normal;
-		font-size:3em;
+		font-size:4em;
 		letter-spacing:1px;
 	}
 	nav{
-		width:300px;
+		width:350px;
 		position:absolute;
 		counter-reset:instructions;
-		text-align: center;
+		text-align: left;
+		z-index:1;
 	}
-
+		nav h1{
+			text-align:left;
+		}
 
 		nav h2{
 			text-align:left;
@@ -268,6 +282,12 @@ section{
 			vertical-align:middle;
 		}
 
+		section .stage div:not(:first-child){
+			height:1px;
+			width:1px;
+			overflow: hidden;
+		}
+
 		section .stage > div > div{
 			margin: auto;
 			height:100px;
@@ -286,6 +306,7 @@ footer{
 	left: 0;
 	right: 0;
 	background-color: rgba(0, 0, 0, 0.5);
+	z-index:2;
 }
 	footer > * {
 		display: inline-block;
@@ -313,7 +334,7 @@ footer{
 
 	<h2>Find your song</h2>
 	<form class='search'>
-		<input type="search" id='search' /><button>&#9654;</button>
+		<input type="search" id='search' />
 	</form>
 	<ul>
 	</ul>
@@ -322,7 +343,7 @@ footer{
 	<h2>Tell us your name</h2>
 	<form class='join'>
 		<input type="text" id='name' placeholder='Choose a star name'/>
-		<button>Get in line</button>
+		<button>Go</button>
 	</form>
 
 	<h1>Next up...</h1>
