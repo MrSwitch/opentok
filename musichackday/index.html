@@ -16,9 +16,6 @@
 		loadScript([['/_packages/jquery.js','http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'][local]]);
 //]]>
 </script>
-<script>
-	var name = 'Bob,Frank,Elvis,Gloria,Whitney,Edith,Jimmy,Mark,Kurt,Ammie,Mick'.split(',')[parseInt(Math.random()*10)];
-</script>
 
 <script>
 // Settings
@@ -55,7 +52,7 @@ session.addEventListener("sessionConnected", function (event) {
 // Tally up the vote ups and the vote downs
 //
 function vote(event){
-	
+
 
 	if("votedown" in event.changedValues){
 		// update local state
@@ -103,10 +100,14 @@ function subscribeStream(streams){
 //        if (stream.connection.connectionId != session.connection.connectionId) {
         	
         	// add dom element
-        	$('<li id="'+ stream.streamId +'"><div><div id="_'+ stream.streamId +'"></div></div> "'+ stream.name +'"</li>').appendTo('ol');
+        	$('<li id="__'+ stream.streamId +'">'+ stream.name +'"</li>').appendTo('ol');
+
+        	// Queue the video
+        	$('<div id="'+ stream.streamId +'"><div><div id="_'+ stream.streamId +'"></div></div> <span>"'+ stream.name +'"</span></div>').appendTo('.stage');
 
         	// Add stream
-            var sub = session.subscribe(stream, '_'+stream.streamId);
+            var sub = session.subscribe(stream, '_'+stream.streamId, {nameDisplayMode:'off'});
+			sub.setStyle("nameDisplayMode", "off");
 
 			$('#'+sub.id).width('100%').height('100%');
 
@@ -131,9 +132,10 @@ function unsubscribeStream(streams){
         	$('#usermedia').hide();
         }
     }
+
+    // If you are live on stage
+    // 
 }
-
-
 
 
 
@@ -144,16 +146,24 @@ $('#signal-test').click(function(){
 </script>
 <style>
 	body{
-		padding:20px 0 0 60px;
+		padding:20px 0 0 0;
 		font-family: 'Droid Sans', Helvetica, Arial, sans-serif;
 		color:#eee;
-		background:#000 368px 157px no-repeat url(img/stage-bg.jpg);
+		padding-left:40px;
+		background:black;
+		position:fixed;
+		top:0;
+		left:0;
+		right:0;
+		bottom:0;
+		height:100%;
+		width:100%;
 	}
 	*{
 		box-sizing:border-box;
 	}
 
-	h1{
+	header h1{
 		margin-top:0;
 		font-family: 'Paytone One', Helvetica, Arial, sans-serif;
 		font-weight:normal;
@@ -181,62 +191,113 @@ $('#signal-test').click(function(){
 			content: counter(instructions) '. ';
 		}
 
-	section{
-		margin-left:320px;
-		text-align: center;
-	}
-		section button{
-			font-size:2em;
-			border-radius:30px;
-			border:none;
-		}
-		section button:hover{
-			color:white;
-		}
-		button.voteup{
-			background-color:lime;
-		}
-		button.votedown{
-			background-color:red;
-		}
+
 
 	ul,ol{
 		margin:0;
 		padding:0;
-	}
-	ul li, ol li{
-		list-style:none;
-	}
-	ul li{
-		-webkit-transition:all 0.3s;
 		text-align:left;
 	}
-	ul li:hover{
-		background-color:rgba(255,255,255,0.1);
+		li{
+			list-style:none;
+			text-align:left;
+		}
+		ul li{
+			-webkit-transition:all 0.3s;
+			height:50px;
+		}
+		li img{
+			width:40px;
+			margin: 5px;
+			vertical-align: middle;
+		}
+		ul li:hover{
+			background-color:rgba(255,255,255,0.1);
+		}
+		ul li.selected{
+			padding-left:20px;
+			background-color:gold;
+			color:black;
+		}
+		ul li.hide{
+			height:0;
+			overflow: hidden;
+		}
+
+
+section{
+	background:url(img/stage-bg.jpg) no-repeat top center;
+	position:absolute;
+	text-align: center;
+	height:500px;
+	left:300px;
+	top:0;
+	right:0;
+	height:100%;
+	bottom:0;
+}
+	section button{
+		font-size:2em;
+		border-radius:30px;
+		border:none;
 	}
-	ul li.selected{
-		padding-left:20px;
-		background-color:gold;
-		color:black;
+	section button:hover{
+		color:white;
+	}
+	button.voteup{
+		background-color:lime;
+	}
+	button.votedown{
+		background-color:red;
 	}
 
-	ol li{
-		text-align: center;
+
+	section .stage{
+		margin:0 20px;
+		margin-top:220px;
 	}
-	ol li div{
-		margin: auto;
-		height:100px;
-		width:150px;
+		section .stage span{
+			display: block;
+			border-radius:10px;
+			margin:5px;
+			background-color:rgba(0,0,0,0.5);
+			color:white;
+		}
+		section .stage div img{
+			width:60px;
+			vertical-align:middle;
+		}
+
+		section .stage > div > div{
+			margin: auto;
+			height:100px;
+			width:150px;
+		}
+		section .stage > div:first-child div{
+			width:400px;
+			height:300px;
+		}
+
+
+footer{
+	position:absolute;
+	bottom:0;
+	height: 100px;
+	left: 0;
+	right: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+}
+	footer > * {
+		display: inline-block;
+		margin:5px;
+		float:left;
+		vertical-align:top;
 	}
-	ol li:first-child {
-		width:873px;
-		height:648px;
-		padding-top:180px;
+
+	footer button{
+		font-size:2em;
 	}
-	ol li:first-child div{
-		height:300px;
-		width:400px;
-	}
+
 	nav input {
 		-webkit-appearance: textfield;		
 		font-size: 1.5em;
@@ -244,10 +305,11 @@ $('#signal-test').click(function(){
 
 </style>
 <header>
-	<h1>TokStar</h1>
+	<h1>tokStar</h1>
 </header>
 
 <nav>
+
 
 	<h2>Find your song</h2>
 	<form class='search'>
@@ -255,7 +317,6 @@ $('#signal-test').click(function(){
 	</form>
 	<ul>
 	</ul>
-	<audio controls></audio>
 
 
 	<h2>Tell us your name</h2>
@@ -264,27 +325,29 @@ $('#signal-test').click(function(){
 		<button>Get in line</button>
 	</form>
 
-
-	<div id='usermedia' style="display:none;">
-		<h2>Verify your camera</h2>
-		<div id="videowall"></div>
-		<button class="boot">Choke</button>
-	</div>
-
+	<h1>Next up...</h1>
+	<ol></ol>
 </nav>
 <section>
+	
+	<div class="stage">
+	</div>
 
 	<button class="voteup">&#x2714; oh yeah! <span class="votesup"></span></button> <button class="votedown">&#x2718; boo! <span class="votesdown"></span></button>
-	<ol>
-	</ol>
 	
-<section>
+</section>
 
+<footer id='usermedia' style="display:none;">
+	<div id="videowall"></div>
+	<button class="boot">Choke</button>
+	<audio controls></audio>
+</footer>
 
 <script>
 
 	$('form.search').submit(function(e){
 		e.preventDefault();
+		$('ul li:not(.selected)').addClass('hide');
 		$.getJSON('http://developer.echonest.com/api/v4/song/search?api_key=N6E4NIOVYMTHNDM8J&format=jsonp&results=20&title='+		this.search.value
 +'&bucket=id:7digital-US&bucket=tracks&callback=?', function(r){
 			$.each(r.response.songs, function(i,o){
@@ -293,8 +356,8 @@ $('#signal-test').click(function(){
 					return;
 				}
 
-				$('<li>'+ o.title + ' by ' + o.artist_name +'</li>').appendTo('ul').click(function(){
-					$(this).addClass('selected').siblings().removeClass('selected');
+				$('<li><img src="' + o.tracks[0].release_image + '"/>'+ o.title + ' by ' + o.artist_name +'</li>').appendTo('ul').click(function(){
+					$(this).addClass('selected').siblings().removeClass('selected').addClass('hide');
 					$('audio').get(0).pause();
 					$('audio').html('<source src="'+o.tracks[0].preview_url+'" type="audio/mpeg"/>');
 				});
@@ -308,10 +371,14 @@ $('#signal-test').click(function(){
 		// Enable join
 		$('#usermedia').show();
 
+		// Build placeholder for the Publisher
 		$('#videowall').html('<div id="publisher"></div>');
 
+		// Add the Song Name and Artist
+		var name = $('ul li.selected').html() + ' ('+this.name.value+')';
+
 		// Publish your own stream
-		publisher = session.publish('publisher', {name:this.name.value} );
+		publisher = session.publish('publisher', {name:name, nameDisplayMode:'off', width:150, height: 100} );
 	});
 
 
