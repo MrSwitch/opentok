@@ -126,13 +126,13 @@ function unsubscribeStream(streams){
 
         	// Hide the users video
         	$('#usermedia').hide();
-
-        	// Are you on stage and being booted?
-        	if($('section .stage > div:first').attr('id') === ''+stream.streamID){
-        		// Reset the state
-				stateManager.set({votedown:0,voteup:0});
-        	}
         }
+
+    	// Are you on stage and being booted?
+    	if($('section .stage > div:first').attr('id') === ''+stream.streamID){
+    		// Reset the state
+			stateManager.set({votedown:0,voteup:0});
+    	}
 
         // Remove
         $('#'+stream.streamId).remove();
