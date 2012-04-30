@@ -474,11 +474,21 @@ footer{
 	$('form.join').submit(function(e){
 		e.preventDefault();
 
+		// Empty Song
+		if($('ul li.selected').length === 0){
+			if($('ul li').length === 0){
+				$('form.search').submit();
+			}
+			alert('Please select a song');
+			return;
+		}
+
 		// Enable join
 		$('#usermedia').show();
 
 		// Build placeholder for the Publisher
 		$('#videowall').html('<div id="publisher"></div>');
+
 
 		// Add the Song Name and Artist
 		var name = $('ul li.selected').html() + ' ('+this.name.value+')';
