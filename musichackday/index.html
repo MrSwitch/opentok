@@ -353,19 +353,50 @@ section{
 
 
 footer{
-	position:absolute;
-	bottom:0;
-	height: 100px;
+	position: absolute;
+	bottom: 0;
 	left: 0;
-	right: 0;
-	background-color: rgba(0, 0, 0, 0.5);
-	z-index:2;
+	z-index: 2;
+	text-align: right;
+	padding: 10px;
+	padding-left: 300px;
 }
 	footer > * {
 		display: inline-block;
 		margin:5px;
 		float:left;
 		vertical-align:top;
+	}
+	footer #videowall{
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		padding: inherit;
+		padding-left: 0;
+	}
+
+	footer #videowall + div{
+		position: absolute;
+		bottom: 0;
+		padding: 10px;
+	}
+
+	footer #videowall + div:before, footer #videowall:before{
+		content:' ';
+		border-radius: 10px;
+		background-color: rgb(255, 255, 255);
+		position: absolute;
+		padding:10px;
+		left:0;
+		bottom:0;
+		opacity:0.1;
+		top:0;
+		right:0;
+		z-index:-1;
+	}
+
+	footer audio{
+
 	}
 
 	footer button{
@@ -412,8 +443,10 @@ footer{
 
 <footer id='usermedia' style="display:none;">
 	<div id="videowall"></div>
-	<button class="boot">Choke</button>
-	<audio controls></audio>
+	<div>
+		<button class="boot">Choke</button>
+		<audio controls></audio>
+	</div>
 </footer>
 
 <script>
