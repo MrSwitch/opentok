@@ -456,7 +456,7 @@ footer{
 +'&bucket=id:7digital-US&bucket=tracks&callback=?', function(r){
 			$.each(r.response.songs, function(i,o){
 
-				if(!o.hasOwnProperty('tracks') && o.tracks.length > 0 ){
+				if(!o.hasOwnProperty('tracks') || o.tracks.length === 0 ){
 					return;
 				}
 
