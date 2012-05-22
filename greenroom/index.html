@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--     
+    <script src="http://staging.tokbox.com/v0.91/js/TB.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+ -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="http://drew.local:8081/v0.91/js/TB.min.js?apikey=12142792"></script>
+    <script src="http://mrswitch.github.com/jquery.prompt.js/jquery.prompt.js" ></script>
+    <link rel="stylesheet" href="http://mrswitch.github.com/jquery.prompt.js/jquery.prompt.css"/>
+    <style>
+        .jquery_prompt form{
+            background-color:lime;
+        }
+    </style>
+    <link rel="stylesheet" href="greenroom.css" />
+    <script src="greenroom.jquery.js"></script>
+
+</head>
+<body>
+
+    <section>
+        <div id="localMediaContainer">
+            <div id="localMedia"></div>
+        </div>
+        <button class="greenroom">GreenRoom</button>
+    </section>
+
+<script>
+
+
+// Settings
+var apiKey = '12142792';
+
+// Attach the localMedia to the div#localMedia
+localMedia = TB.initLocalMedia('localMedia', {apikey: apiKey, width: 400, height:300, name:"Test"});
+
+$('button.greenroom').click(function(){
+    // Take the Publisher widget and call the greenroom API around it.
+    $(localMedia).greenroom();
+});
+
+
+	</script>
+
+
+</body>
+</html>

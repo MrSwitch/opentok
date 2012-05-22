@@ -1,0 +1,53 @@
+/** GREEN STYLE */
+
+       #greenroom h1{
+            color:#00A000;
+        }
+        #greenroom label{
+            color:rgba(0,0,0,0.5);
+            width:100%;
+            display: block;
+            text-align:center;
+        }
+        #greenroom img{
+            display: block;
+            margin:auto;
+        }
+        #greenroom select{
+            font-size: 2.5em;
+        }
+        #greenroom a{
+            font-size: small;
+            display: block;
+        }
+        #greenroom label span.smile{
+			-webkit-transform: rotate(90deg);
+			-moz-transform: rotate(90deg);
+			transform: rotate(90deg);
+			display: inline-block;
+			-webkit-transition:all 1s;
+        }
+        #greenroom .volume{
+            display:inline-block;
+            position: relative;
+            width:100%;
+            vertical-align:top;
+            min-height:40px;
+            background-image:-webkit-linear-gradient(275deg, transparent 27px, rgba(0,255,0,0.5) 30px);
+        }
+            #greenroom .volume input{
+                position: absolute;
+                z-index:1;
+                bottom:-10px;
+            }
+            #greenroom .volume div{
+                position: absolute;
+                top:0;
+                z-index:0;
+                bottom:0;
+                color: transparent;
+                -webkit-transition:width 0.2s;
+                -moz-transition:width 0.2s;
+                transition:width 0.2s;
+                background-image:-webkit-linear-gradient(275deg, transparent 27px, rgba(255,0,0,0.8) 30px);
+            }

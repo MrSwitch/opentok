@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--     
+    <script src="http://staging.tokbox.com/v0.91/js/TB.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+ -->
+    <script src="http://drew.local:8081/v0.91/js/TB.min.js?apikey=12142792"></script>
+    <script src="/_packages/jquery.js"></script>
+    <style>
+        body{
+            font-family:verdana;
+        }
+        .active{
+            color:green;
+        }
+        .volume{
+            display:inline-block;
+            height:50px;
+            width:30px;
+            vertical-align:top;
+            background-image:-webkit-linear-gradient(195deg, white 27px, #eee 30px);
+            background-image:-moz-linear-gradient(195deg, white 27px, #eee 30px);
+            background-image:linear-gradient(195deg, white 27px, #eee 30px);
+        }
+            .volume div{
+                width:100%;
+                background-color:green;
+                -webkit-transition:height 0.2s;
+                -moz-transition:height 0.2s;
+                transition:height 0.2s;
+                background-image:-webkit-linear-gradient(195deg, white 27px, red 30px);
+                background-image:-moz-linear-gradient(195deg, white 27px, red 30px);
+                background-image:linear-gradient(195deg, white 27px, red 30px);
+            }
+        #num_streams:not(:empty):after{
+            content: "# of streams in session";
+        }
+
+        #toggleLocalMedia ~ div.greenroom{
+            display: none;
+        }
+        #toggleLocalMedia.active ~ div.greenroom{
+            display: block;
+        }
+        pre:before{
+            content:"Events";
+            display: block;
+            font-size:1.1em;
+            font-weight:bold;
+            text-decoration:underline;
+        }
+        pre{
+            display: inline-block;
+            vertical-align: top;
+            margin: 0 20px;
+            background: #EEE;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="toggleLocalMedia">Toggle localMedia</button> 
+
+    <br />
+
+    <div id="localMediaContainer" style="display:inline-block;"></div><pre style="display:inline-block;" id="logs"></pre>
+
+
+    <div class="greenroom">
+
+        <button id="toggleStreams">Stream</button>  <span id="num_streams"></span>
+
+        <br />
+        <label>Prevent localMedia.destroy() on streamDestroyed</label> <input id='preventDestroy' type="checkbox" checked/>
+
+        <br />
+        <label>Monitor Mic Activity</label>
+        <button id="toggleMicActivity">Monitor Mic Activity</button>
+        <div class="volume">
+            <div></div>
+        </div>
+        <br />
+        <label>Switch devices</label>
+        <select name="cams" id="cams"></select>
+        <select name="mics" id="mics"></select>
+        <button id='refreshDevices'>refresh device lists</button>
+
+        <br>
+        <label>Adjust Mic Gain </label><input type="range" id="gain" min=0 max=100 />
+
+        <br />
+        <label>Publish Audio</label> <input class="toggleBool" type="checkbox" name="publishAudio" checked/>
+        <br />
+        <label>Publish Video</label> <input class="toggleBool" type="checkbox" name="publishVideo" checked/>
+
+        <br />
+        <button class="mugshot">Capture Img</button> <img style="width:30px;"/>
+
+    <div>
+
+	<script>
+
+
+
+// Settings
+var apiKey = '12142792',
+    token = "devtoken",
+    sessionID = "1_MX4xMjE0Mjc5Mn4xMjcuMC4wLjF-MjAxMi0wMi0yMyAyMzowNDoxOC44NTE2ODQrMDA6MDB-MC44MzE0ODQwMzIwMjV-",
+    localMedia,
+    greenRoomCompleted = false,
+    sessionConnected = false;
+
+
+function log(e){
+    console.log(e);
+    $('#logs').prepend(''+e.type+"\n");
+}
+
+// define debug level and global exception handler
+TB.setLogLevel(TB.DEBUG);
+TB.addEventListener("exception", function(event){ alert("Exception:" + event.code +';'+ event.title + ". " + event.message)});
+
+//
+// SESSION
+// Add our session ID
+//
+var session = TB.initSession(sessionID);
+
+// Add Callback Handler to the sessionConnedted Event
+session.addEventListener("sessionConnected", log);
+
+session.addEventListener("sessionDisconnected", log);
+
+session.addEventListener("streamCreated", function(e){
+
+    count(1);
+    log(e);
+});
+
+session.addEventListener("streamDestroyed", function(e){
+    count(-1);
+    log(e);
+
+    if($('#preventDestroy').attr('checked')){
+        e.preventDefault();
+    }
+});
+
+session.connect(sessionID, token);
+
+
+
+//
+// CHECK SYSTEM REQUIREMENTS
+// Verify user has the minimum requirements for our app
+//
+if( TB.checkSystemRequirements('h264') ){
+    TB.upgradeSystemRequirements();
+}
+
+
+
+//session.connect(apiKey, token);
+
+
+
+
+
+$('#toggleLocalMedia').click(function(){
+
+    var bool = $(this).toggleClass('active').is('.active');
+
+
+    // Do we need to create a new session?
+    if(bool){
+
+         
+        // 
+        // PUBLISHER
+        // Create a replaceable element within our container
+        // Ok dont have to do this for the test, but its common practice.
+        //
+        document.getElementById('localMediaContainer').appendChild((function(){
+            var div = document.createElement('div');
+            div.setAttribute('id', 'localMedia');
+            return div;
+        })());
+
+        // Attach the localMedia to the div#localMedia, but disable autoconnect so that we only start streaming when we can
+        // NEW ATTRIBUTE
+        // localMedia = session.publish('localMedia', {width: 400, height:300, name:"Test", autoConnect:false});
+
+        // Alternative 
+        // I would love it if this could be called, getUserMedia and then in a callback bind it to a video tag...
+        /**/
+        localMedia = TB.initLocalMedia('localMedia', {apikey: apiKey, width: 400, height:300, name:"Test"});
+        localMedia.setMicrophoneGain(60);
+
+
+        // Add a callback triggered after localMedia.detectDevices() has been fired.
+        localMedia.addEventListener("devicesDetected", function(event){
+
+            // event
+            console.log(event);
+
+            var devices = [
+                { selector : 'select#mics', event : event.microphones, selected : event.selectedMicrophone.name },
+                { selector : 'select#cams', event : event.cameras, selected : event.selectedCamera.name }
+            ];
+
+            $.each( devices, function( i, dev ){
+
+                // Of the devices use the selector to determine the <SELECT> tag to filter
+                var $sel = $(dev.selector);
+
+                // Add new items to the List
+                $.each( dev.event, function(i,item){
+                    var $opt = $sel.find('option[value="'+item.name+'"]');
+                    if( $opt.length === 0 ){
+                        $opt = $('<option>'+item.name+'</option>').val(item.name).appendTo($sel);
+                    }
+                    if(item.status==='active'){
+                        $opt.attr('selected','selected');
+                    }
+                });
+
+                // Remove existing items in the list.
+                $sel.find('option').filter(function(){
+                    var opt = this, b = false;
+                    $.each( dev.event, function(i,o){
+                        if( o.name === $(opt).text() ){
+                            b = true;
+                            return;
+                        }
+                    });
+                    return !b;
+                }).remove();
+
+                // Selected
+                $sel.find('option[value="'+ dev.selected +'"]').attr('selected', 'selected');
+            });
+
+        });
+
+        localMedia.detectDevices();
+
+
+        localMedia.addEventListener('microphoneActivityLevel', function(e){
+            var v = e.value;
+            $('.volume div').html(v).height(v+'%');
+        });
+
+        // This can be changed by the user in the Flash Widget
+        // Fired everytime it changes
+        localMedia.addEventListener('microphoneGainChanged', function(e){
+            $('#gain').val(e.value);
+        });
+
+        // If no access to the device then popup the accessDialog
+        // NEW EVENT 
+        localMedia.addEventListener('accessDialogOpened', log);
+
+        // Now 
+        // NEW EVENT 
+        // localMedia.addEventListener('accessDialogClosed', status('accessDialogClosed') );
+
+
+        // Add event to start the other greenroom functionality once the accessAllowed is clicked
+        localMedia.addEventListener('accessAllowed', log);
+
+        // Add event to start the other greenroom functionality once the accessAllowed is clicked
+        // NEW EVENT
+        // Passes in :checked or :unchecked
+        //localMedia.addEventListener('accessRemembered', status('accessRemembered'));
+
+        localMedia.addEventListener('accessDenied', log);
+
+        // Add event to start the other greenroom functionality once the accessAllowed is clicked
+        // NEW EVENT
+        // Passes in :checked or :unchecked
+        //localMedia.addEventListener('accessRemembered', status('accessRemembered'));
+
+        localMedia.addEventListener('loaded', log);
+    }
+
+    else{
+
+        localMedia.destroy();
+    }
+});
+
+
+
+
+
+
+function count(i){
+    $('#num_streams').html( parseInt($('#num_streams').html() || 0,10) + i );
+}
+
+
+
+$('#toggleStreams').click(function(){
+
+    var bool = $(this).toggleClass('active').is('.active');
+
+    if(bool){
+        session.publish(localMedia);
+    }
+    else{
+
+        var options = {
+            destroyLocalMedia : !$('#preventDestroy').attr('checked')
+        }
+
+        session.unpublish(localMedia,options);
+    }
+
+});
+
+
+
+$('#toggleMicActivity').click(function(){
+
+    var bool = $(this).toggleClass('active').is('.active');
+
+    localMedia.detectMicActivity( bool );
+
+});
+
+
+// Bind events to change the camera
+$('select#mics').change(function(){
+    localMedia.setMicrophone(this.value);
+});
+
+// Bind events to change the camera
+$('select#cams').change(function(){
+    localMedia.setCamera(this.value);
+});
+
+$('#refreshDevices').click(function(){
+    localMedia.detectDevices();
+});
+
+$('#gain').change(function(){
+    localMedia.setMicrophoneGain(this.value);
+});
+
+$('input.toggleBool').change(function(){
+    localMedia[this.name](!!this.checked);
+});
+
+$('button.mugshot').click(function(){
+    var data = localMedia.getImgData();
+    $(this).next('img').attr('src', "data:image/png; base64," + data);
+});
+
+
+	</script>
+
+
+</body>
+</html>
