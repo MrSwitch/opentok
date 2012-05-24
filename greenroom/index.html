@@ -34,11 +34,11 @@
 var apiKey = '12142792';
 
 // Attach the localMedia to the div#localMedia
-localMedia = TB.initLocalMedia('localMedia', {apikey: apiKey, width: 400, height:300, name:"Test"});
+publisher = TB.initPublisher('localMedia', {apikey: apiKey, width: 400, height:300, name:"Test"});
 
 $('button.greenroom').click(function(){
     // Take the Publisher widget and call the greenroom API around it.
-    $(localMedia).greenroom();
+    $(publisher).greenroom();
 });
 
 

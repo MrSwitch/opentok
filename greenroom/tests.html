@@ -37,6 +37,13 @@
             content: "# of streams in session";
         }
 
+        button:before{
+            content: "Initiate: ";
+        }
+        button.active:before{
+            content: "Close: ";
+        }
+
         #toggleLocalMedia ~ div.greenroom{
             display: none;
         }
@@ -61,7 +68,8 @@
 </head>
 <body>
 
-    <button id="toggleLocalMedia">Toggle localMedia</button> 
+    <button id="toggleSession">Session</button> 
+    <button id="toggleLocalMedia">LocalMedia</button> 
 
     <br />
 
@@ -100,7 +108,7 @@
 
     <div>
 
-	<script>
+    <script>
 
 
 
@@ -109,6 +117,7 @@ var apiKey = '12142792',
     token = "devtoken",
     sessionID = "1_MX4xMjE0Mjc5Mn4xMjcuMC4wLjF-MjAxMi0wMi0yMyAyMzowNDoxOC44NTE2ODQrMDA6MDB-MC44MzE0ODQwMzIwMjV-",
     localMedia,
+    session = null,
     greenRoomCompleted = false,
     sessionConnected = false;
 
@@ -122,33 +131,7 @@ function log(e){
 TB.setLogLevel(TB.DEBUG);
 TB.addEventListener("exception", function(event){ alert("Exception:" + event.code +';'+ event.title + ". " + event.message)});
 
-//
-// SESSION
-// Add our session ID
-//
-var session = TB.initSession(sessionID);
 
-// Add Callback Handler to the sessionConnedted Event
-session.addEventListener("sessionConnected", log);
-
-session.addEventListener("sessionDisconnected", log);
-
-session.addEventListener("streamCreated", function(e){
-
-    count(1);
-    log(e);
-});
-
-session.addEventListener("streamDestroyed", function(e){
-    count(-1);
-    log(e);
-
-    if($('#preventDestroy').attr('checked')){
-        e.preventDefault();
-    }
-});
-
-session.connect(sessionID, token);
 
 
 
@@ -166,7 +149,44 @@ if( TB.checkSystemRequirements('h264') ){
 
 
 
+$('#toggleSession').click(function(){
 
+    var bool = $(this).toggleClass('active').is('.active');
+
+    if(bool){
+        //
+        // SESSION
+        // Add our session ID
+        //
+        session = TB.initSession(sessionID);
+
+        // Add Callback Handler to the sessionConnedted Event
+        session.addEventListener("sessionConnected", log);
+
+        session.addEventListener("sessionDisconnected", log);
+
+        session.addEventListener("streamCreated", function(e){
+
+            count(1);
+            log(e);
+        });
+
+        session.addEventListener("streamDestroyed", function(e){
+            count(-1);
+            log(e);
+
+            if($('#preventDestroy').attr('checked')){
+                e.preventDefault();
+            }
+        });
+
+        session.connect(sessionID, token);
+    }
+    else{
+        session.disconnect();
+        session = null;
+    }
+});
 
 $('#toggleLocalMedia').click(function(){
 
@@ -195,7 +215,7 @@ $('#toggleLocalMedia').click(function(){
         // Alternative 
         // I would love it if this could be called, getUserMedia and then in a callback bind it to a video tag...
         /**/
-        localMedia = TB.initLocalMedia('localMedia', {apikey: apiKey, width: 400, height:300, name:"Test"});
+        localMedia = TB.initPublisher('localMedia', {apikey: apiKey, width: 400, height:300, name:"Test"});
         localMedia.setMicrophoneGain(60);
 
 
@@ -288,6 +308,7 @@ $('#toggleLocalMedia').click(function(){
     else{
 
         localMedia.destroy();
+
     }
 });
 
@@ -304,6 +325,11 @@ function count(i){
 
 $('#toggleStreams').click(function(){
 
+    if(!session){
+        alert('Please start a session');
+        return;
+    }
+
     var bool = $(this).toggleClass('active').is('.active');
 
     if(bool){
@@ -312,7 +338,7 @@ $('#toggleStreams').click(function(){
     else{
 
         var options = {
-            destroyLocalMedia : !$('#preventDestroy').attr('checked')
+            destroyPublisher : !$('#preventDestroy').attr('checked')
         }
 
         session.unpublish(localMedia,options);
@@ -359,7 +385,7 @@ $('button.mugshot').click(function(){
 });
 
 
-	</script>
+    </script>
 
 
 </body>
