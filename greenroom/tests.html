@@ -139,7 +139,7 @@ TB.addEventListener("exception", function(event){ alert("Exception:" + event.cod
 // CHECK SYSTEM REQUIREMENTS
 // Verify user has the minimum requirements for our app
 //
-if( TB.checkSystemRequirements('h264') ){
+if( !TB.checkSystemRequirements('h264') ){
     TB.upgradeSystemRequirements();
 }
 
@@ -282,6 +282,10 @@ $('#toggleLocalMedia').click(function(){
         // NEW EVENT 
         localMedia.addEventListener('accessDialogOpened', log);
 
+        // If no access to the device then popup the accessDialog
+        // NEW EVENT 
+        localMedia.addEventListener('accessDialogClosed', log);
+
         // Now 
         // NEW EVENT 
         // localMedia.addEventListener('accessDialogClosed', status('accessDialogClosed') );
@@ -336,12 +340,7 @@ $('#toggleStreams').click(function(){
         session.publish(localMedia);
     }
     else{
-
-        var options = {
-            destroyPublisher : !$('#preventDestroy').attr('checked')
-        }
-
-        session.unpublish(localMedia,options);
+        session.unpublish(localMedia);
     }
 
 });
