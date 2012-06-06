@@ -5,7 +5,7 @@
     <script src="http://staging.tokbox.com/v0.91/js/TB.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
  -->
-    <script src="http://drew.local:8081/v0.91/js/TB.min.js?apikey=12142792"></script>
+    <script src="http://drew.local:8081/v0.91/js/TB.min.js?apiKey=12142792"></script>
     <script src="/_packages/jquery.js"></script>
     <style>
         body{
@@ -215,7 +215,7 @@ $('#toggleLocalMedia').click(function(){
         // Alternative 
         // I would love it if this could be called, getUserMedia and then in a callback bind it to a video tag...
         /**/
-        localMedia = TB.initPublisher('localMedia', {apikey: apiKey, width: 400, height:300, name:"Test"});
+        localMedia = TB.initPublisher(apiKey, 'localMedia', { width: 400, height:300, name:"Test"});
         localMedia.setMicrophoneGain(60);
 
 
