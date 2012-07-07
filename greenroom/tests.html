@@ -124,7 +124,7 @@ var apiKey = '12142792',
 
 function log(e){
     console.log(e);
-    $('#logs').prepend(''+e.type+"\n");
+    $('#logs').prepend(''+(e.type || e)+"\n");
 }
 
 // define debug level and global exception handler
@@ -215,7 +215,7 @@ $('#toggleLocalMedia').click(function(){
         // Alternative 
         // I would love it if this could be called, getUserMedia and then in a callback bind it to a video tag...
         /**/
-        localMedia = TB.initPublisher(apiKey, 'localMedia', { width: 400, height:300, name:"Test"});
+        localMedia = TB.initPublisher(apiKey, 'localMedia', { width: 200, height:100, name:"Test"});
         localMedia.setMicrophoneGain(60);
 
 
@@ -307,6 +307,18 @@ $('#toggleLocalMedia').click(function(){
         //localMedia.addEventListener('accessRemembered', status('accessRemembered'));
 
         localMedia.addEventListener('loaded', log);
+        localMedia.addEventListener('loaded', function(){
+        	log('detectDevices');
+        	localMedia.detectDevices();
+        });
+
+
+        localMedia.addEventListener('deviceInactive', log);
+        localMedia.addEventListener('invalidDeviceName', log);
+        localMedia.addEventListener('echoCancellationModeChanged', log);
+        localMedia.addEventListener('resize', log);
+        localMedia.addEventListener('settingsButtonClick', log);
+
     }
 
     else{
